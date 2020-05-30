@@ -1,4 +1,4 @@
-<%- include("header") -%>
+<%- include("partials/header") -%>
 
 <body>
     <div id="heading">
@@ -7,19 +7,21 @@
     <div class="box">
         <ul>
             </li>
-            <% for (let i=0; i<itemList.length; i++) { %>
-                <div class='item'>
-                    <input type="checkbox" name="" id="">
-                    <p> <%=itemList[i]%> </p>
-                </div>
-                <% } %>
+            <% itemList.forEach(item => { %>
+                <form action="/delete" method="POST">
+                    <div class='item'>
+                        <input type="checkbox" name="checkbox" value="<%= item._id %>" onChange="this.form.submit()">
+                        <p> <%= item.name %> </p>
+                    </div>
+                </form>
+            <% }) %>
             <li>
         </ul>
-        <form action="/" method="POST">
+        <form class="submit" action="/" method="POST">
             <input type="text" name="listItem" placeholder="new item" autocomplete="off">
             <button class='button' type='submit' name='list' value=<%=listTitle%>>+</button>
         </form>
     </div>
 </body>
 
-<%- include("footer") -%>
+<%- include("partials/footer") -%>

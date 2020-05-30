@@ -59,7 +59,7 @@ p {
   color: #A683E3;
 }
 
-form {
+form.submit {
   text-align: center;
   margin-left: 20px;
 }
