@@ -7,6 +7,8 @@ const server = () => {
     const bodyParser = require('body-parser');
     app.use(bodyParser.urlencoded({ extended: true }));
 
+    const _ = require('lodash');
+
     const mongoose = require('mongoose');
 
     mongoose.connect('mongodb://localhost:27017/todolistDB', { useNewUrlParser: true, useUnifiedTopology: true }, (err) => {
@@ -16,7 +18,6 @@ const server = () => {
             console.log("Connected to database");
         }
     });
-
 
     const itemSchema = mongoose.Schema({
         name: String
@@ -28,9 +29,16 @@ const server = () => {
     });
 
     const Item = mongoose.model('item', itemSchema);
-
     const List = mongoose.model('list', listSchema);
 
+    app.set('view engine', 'ejs');
+
+    app.listen('3000', () => {
+        console.log('listening on port 3000');
+    });
+
+
+    //default list
     const item1 = new Item({
         name: 'Welcome to your to-do-list!'
     });
@@ -44,14 +52,6 @@ const server = () => {
     });
 
     const defaultItems = [item1, item2, item3];
-
-
-    app.set('view engine', 'ejs');
-
-
-    app.listen('3000', () => {
-        console.log('listening on port 3000');
-    });
 
 
     app.get('/', (req, res) => {
@@ -74,45 +74,64 @@ const server = () => {
         });
     });
 
-    
     app.get('/:listId', (req, res) => {
-        let listName = req.params.listId;
+        let listName = _.capitalize(req.params.listId);
 
         List.findOne({ name: listName }, (err, result) => {
             if (!err) {
                 if (!result) {
-                    let list = new List({name: listName, items: defaultItems});
+                    let list = new List({ name: listName, items: defaultItems });
                     list.save();
-                    console.log("new list added");
                     res.redirect(`/${listName}`);
                 } else {
-                    res.render('list', {listTitle: listName, itemList: result.items});
+                    res.render('list', { listTitle: listName, itemList: result.items });
                 }
             }
         })
     });
 
-
     app.post('/', (req, res) => {
+        let itemName = req.body.listItem;
+        let listTitle = req.body.list;
+        const newItem = new Item({ name: itemName });
 
         if (req.body.list === "Today") {
-            let itemName = req.body.listItem;
-            const newItem = Item({name: itemName});
             newItem.save();
             res.redirect('/');
+        } else {
+            List.findOneAndUpdate({ name: listTitle }, { $push: { items: newItem } }, { useFindAndModify: false }, (err, docs) => {
+
+                if (!err) {
+                    res.redirect(`/${listTitle}`);
+                }
+
+            });
         }
 
     });
 
-
     app.post('/delete', (req, res) => {
         let itemId = req.body.checkbox;
-        Item.findOneAndDelete(itemId, err => {
-            if(!err) {
-                console.log('Successfully removed Item');
-            }
-        });
-        res.redirect('/');
+        let listTitle = req.body.list;
+
+        if (listTitle === 'Today') {
+            Item.findOneAndDelete(itemId, err => {
+
+                if (!err) {
+                    console.log('Successfully removed Item');
+                }
+
+            });
+            res.redirect('/');
+        } else {
+            List.findOneAndUpdate({ name: listTitle }, { $pull: { items: { _id: itemId } } }, { useFindAndModify: false }, (err, docs) => {
+
+                if (!err) {
+                    res.redirect(`/${listTitle}`);
+                }
+
+            })
+        }
     });
 }
 

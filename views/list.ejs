@@ -2,7 +2,7 @@
 
 <body>
     <div id="heading">
-        <h1><%=listTitle%></h1>
+        <h1><%= listTitle %></h1>
     </div>
     <div class="box">
         <ul>
@@ -12,6 +12,7 @@
                     <div class='item'>
                         <input type="checkbox" name="checkbox" value="<%= item._id %>" onChange="this.form.submit()">
                         <p> <%= item.name %> </p>
+                        <input type="hidden" name="list" value="<%= listTitle %>">
                     </div>
                 </form>
             <% }) %>
@@ -19,7 +20,7 @@
         </ul>
         <form class="submit" action="/" method="POST">
             <input type="text" name="listItem" placeholder="new item" autocomplete="off">
-            <button class='button' type='submit' name='list' value=<%=listTitle%>>+</button>
+            <button class='button' type='submit' name='list' value='<%= listTitle %>'>+</button>
         </form>
     </div>
 </body>
