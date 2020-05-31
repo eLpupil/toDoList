@@ -77,14 +77,14 @@ const server = () => {
     app.get('/:listId', (req, res) => {
         let listName = _.capitalize(req.params.listId);
 
-        List.findOne({ name: listName }, (err, result) => {
+        List.findOne({ name: listName }, (err, docs) => {
             if (!err) {
-                if (!result) {
+                if (!docs) {
                     let list = new List({ name: listName, items: defaultItems });
                     list.save();
                     res.redirect(`/${listName}`);
                 } else {
-                    res.render('list', { listTitle: listName, itemList: result.items });
+                    res.render('list', { listTitle: listName, itemList: docs.items });
                 }
             }
         })
