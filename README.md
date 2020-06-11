@@ -8,3 +8,5 @@ Hosting: Heroku, MongoDB Atlas
 Learned to implement NoSQL CRUD operations in a node.js app and deploying the webapp. 
 
 Check it out in description link.
+
+Append /[listname] to create new list.
